@@ -1400,7 +1400,7 @@ static const UIViewAnimationOptions kDefaultAnimationOptions = UIViewAnimationOp
             if (![self cellForItemAtIndex:positionToLoad]) 
             {
                 GMGridViewCell *cell = [self newItemSubViewForPosition:positionToLoad];
-                [self addSubview:cell];
+                [self addCellSubview:cell];
             }
         }
     }    
@@ -1543,7 +1543,7 @@ static const UIViewAnimationOptions kDefaultAnimationOptions = UIViewAnimationOp
     CGPoint origin = [self.layoutStrategy originForItemAtPosition:index];
     cell.frame = CGRectMake(origin.x, origin.y, _itemSize.width, _itemSize.height);
     cell.alpha = 0;
-    [self addSubview:cell];
+    [self addCellSubview:cell];
     
     currentView.tag = kTagOffset - 1;
     BOOL shouldScroll = animation & GMGridViewItemAnimationScroll;
@@ -1640,7 +1640,7 @@ static const UIViewAnimationOptions kDefaultAnimationOptions = UIViewAnimationOp
             cell.alpha = 1.0;
             [UIView commitAnimations];
         }
-        [self addSubview:cell];
+        [self addCellSubview:cell];
     }
     
     _numberTotalItems++;
@@ -1774,6 +1774,25 @@ static const UIViewAnimationOptions kDefaultAnimationOptions = UIViewAnimationOp
 - (UIScrollView *)scrollView
 {
     return self;
+}
+
+//////////////////////////////////////////////////////////////
+#pragma mark fix for hiding scrollers
+//////////////////////////////////////////////////////////////
+
+- (void)addCellSubview:(UIView *)cellSubview {
+    UIView *scrollerView = nil;
+    for (UIView *subview in [self subviews]) {
+        if (![subview isKindOfClass:[GMGridViewCell class]]) {
+            scrollerView = subview;
+            break;
+        }
+    }
+    if (scrollerView) {
+        [self insertSubview:cellSubview belowSubview:scrollerView];
+    } else {
+        [self addSubview:cellSubview];
+    }
 }
 
 @end
